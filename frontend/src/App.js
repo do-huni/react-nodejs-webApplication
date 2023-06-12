@@ -4,8 +4,10 @@ function App() {
 	
 	let [logo, setLogo] = useState("ReactBlog");
 	let [postNames, setPostNames] = useState(["전역 방법 추천", "여자 코트 추천", "남자 코트 추천", "시간이 안감"]);
-	let [like, setLike] = useState(0);
+	let [like, setLike] = useState([0,0,0,0]);
 	let [modal, setModal] = useState(false);
+	let [title, setTitle ] = useState(0);
+
   return (
     <div className="App">
 		  <div className = "black-nav">
@@ -16,37 +18,52 @@ function App() {
 				  copy.sort();
 				  setPostNames(copy);
 			  }}>정렬</button>
-		  <div className = "list">
-			  <h4 onClick = {()=>{
-					  modal ? setModal(false) : setModal(true);
-				  }}>{postNames[0]} <span onClick = {() =>{setLike(like+1)}}>👍</span>{like}</h4>
-			  <p>2월 17일 발행</p>
-		  </div>
-		  <div className = "list">
-			  <h4>{postNames[1]}</h4>
-			  <p>2월 17일 발행</p>
-		  </div>
-		  <div className = "list">
-			  <h4>{postNames[2]}</h4>
-			  <p>3월 19일 발행</p>
-		  </div>		  
-		  <div className = "list">
-			  <h4>{postNames[3]}</h4>
-			  <p>3월 19일 발행</p>
-		  </div>	
 		  {
-			  (modal) ? <Modal/> : null		
+			postNames.map((a, i)=>{
+				return (
+				  <div className = "list" key = {i}>
+					  <h4 onClick = {()=>{
+							  setTitle(i);
+							  modal ? setModal(false) : setModal(true);
+						  }}>{a} <span onClick = {(e) =>{
+								  e.stopPropagation();
+								  let copy = [...like];
+								  copy[i] += 1;
+								  setLike(copy);}
+							  }>👍</span>{like[i]}</h4>
+					  <p>2월 17일 발행</p>
+					  <button onClick = {()=>{
+								let copy = [...postNames];
+								copy.splice(i, 1);
+								setPostNames(copy);
+							}}>삭제</button>
+				  </div>			
+				)
+			})			  			  
 		  }
+		  {
+			  (modal) ? <Modal postNames={postNames} setPostNames={setPostNames} title = {title}/> : null		
+		  }
+		  <input type = "text" id = "addInput"></input>
+		  <button onClick = { () =>{
+				  let copy = [...postNames];
+			      copy.push(document.getElementById('addInput').value);
+				  setPostNames(copy);
+				  copy = [...like];
+				  copy.push(0);
+				  setLike(copy);
+				  }}>추가</button>
     </div>
   );
 }
 
-function Modal(){
+function Modal(props){
 	return (
 	  <div className = "modal">
 		  <h4>제목</h4>
-		  <p>날짜</p>
+		  <p>{props.postNames[props.title]}</p>
 		  <p>상세내용</p>
+		  <button onClick={() =>{props.setPostNames(["전역 방법 추우천", "여자 코트 추천", "남자 코트 추천", "시간이 안감"])}} >글 수정</button>
 	  </div>		
 	);
 }
